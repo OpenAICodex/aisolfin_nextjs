@@ -86,9 +86,10 @@ export async function POST(req: NextRequest) {
     businessValue: businessPrompt,
     toolsAutomation: toolsPrompt
   };
-  // Use a service client to bypass RLS on admin_settings if needed
-  const supabaseService = createServerSupabaseClient();
-  const supabase = supabaseService ?? supabaseUser;
+  // Use a service client to bypass RLS on admin_settings if the service key is available
+  const supabase = process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? createServerSupabaseClient()
+    : supabaseUser;
   const { error: updateError } = await supabase
     .from('admin_settings')
     .update({ prompts: newPrompts })
